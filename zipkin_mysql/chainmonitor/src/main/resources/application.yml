@@ -1,0 +1,48 @@
+server:
+  port: 8770
+
+spring:
+  application:
+    name: chainmonitor
+  datasource:
+    url: jdbc:mysql://localhost:3306/zipkin?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    initialization-mode: always
+    continue-on-error: true
+    schema: classpath:/zipkin.sql
+    dbcp2:
+      #初始化连接:连接池启动时创建的初始化连接数量
+      initial-size: 50
+      #从连接池获取一个连接时，最大的等待时间,连接池会等待N毫秒，等待不到，则抛出异常
+      max-wait-millis: 60000
+      #最大空闲连接:连接池中容许保持空闲状态的最大连接数量,超过的空闲连接将被释放,如果设置为负数表示不限制
+      max-idle: 100
+      #通过这个池创建连接的默认自动提交状态。如果不设置，则setAutoCommit 方法将不被调用
+      default-auto-commit: true
+      #通过这个池创建连接的默认只读状态
+      default-read-only: false
+      #指明在从池中租借对象时是否要进行验证有效，如果对象验证失败，则对象将从池子释放，然后我们将尝试租借另一个
+      test-on-borrow: true
+    type: org.apache.commons.dbcp2.BasicDataSource
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: false
+zipkin:
+  storage:
+    type: mysql
