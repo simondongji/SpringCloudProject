@@ -1,0 +1,15 @@
+server:
+  port: 8800
+
+spring:
+  application:
+    name: provider
+  zipkin:
+    base-url: http://chainmonitor/
+  sleuth:
+    sampler:
+      probability: 1.0
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
