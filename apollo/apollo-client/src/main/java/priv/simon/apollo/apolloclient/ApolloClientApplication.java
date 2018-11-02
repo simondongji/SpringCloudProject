@@ -4,6 +4,7 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.model.ConfigChangeEvent;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfig;
 import com.ctrip.framework.apollo.spring.annotation.ApolloConfigChangeListener;
+import com.ctrip.framework.apollo.spring.annotation.ApolloJsonValue;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.sql.rowset.spi.SyncResolver;
+import java.util.List;
 import java.util.Set;
 
 @EnableApolloConfig
@@ -59,5 +62,15 @@ public class ApolloClientApplication {
     if (changeEvent.isChanged("timeout")) {
       System.out.println(config.getIntProperty("timeout", 0));
     }
+  }
+  //4. @ApolloJsonValue使用
+  @ApolloJsonValue("${jsonBeanProperty:[]}")
+  private List<User> anotherJsonBeans;
+  
+  @RequestMapping("/index4")
+  public void hello4(){
+    anotherJsonBeans.forEach(item -> {
+      System.err.println(item.getUsername()+"--"+item.getPassword());
+    });
   }
 }
