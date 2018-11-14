@@ -3,6 +3,7 @@ package priv.simon.oauth2.authresourceserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -17,6 +18,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -36,16 +38,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Autowired
   UserDetailsService userDetailsService;
   
-  // 使用最基本的InMemoryTokenStore生成token
-//  @Bean
-//  public TokenStore memoryTokenStore() {
-//    return new InMemoryTokenStore();
-//  }
-  
-  /**
-   * 使用JwtTokenStore生成token
-   * @return
-   */
   @Bean
   public TokenStore tokenStore(){
     return new JwtTokenStore(accessTokenConverter());
@@ -55,11 +47,13 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Bean
   public JwtAccessTokenConverter accessTokenConverter() {
     final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-    converter.setSigningKey("123");
-//    converter.setAccessTokenConverter(new CustomerAccessTokenConverter());
+//    converter.setSigningKey("123");
+    KeyStoreKeyFactory keyStoreKeyFactory =
+            new KeyStoreKeyFactory(new ClassPathResource("mytest.jks"), "mypass".toCharArray());
+    converter.setKeyPair(keyStoreKeyFactory.getKeyPair("mytest"));
+    converter.setAccessTokenConverter(new CustomerAccessTokenConverter());
     return converter;
   }
-  
   
   /**
    * 注入自定义token生成方式
@@ -70,8 +64,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public TokenEnhancer customerEnhancer() {
     return new CustomTokenEnhancer();
   }
-  
-  
   
   /**
    * 配置客户端详情服务
@@ -117,17 +109,17 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     endpoints.accessTokenConverter(accessTokenConverter());
     endpoints.userDetailsService(userDetailsService);
     //自定义token生成方式
-//    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-//    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(customerEnhancer(),accessTokenConverter()));
-//    endpoints.tokenEnhancer(tokenEnhancerChain);
+    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(customerEnhancer(),accessTokenConverter()));
+    endpoints.tokenEnhancer(tokenEnhancerChain);
     
-    //配置TokenServices参数
-//    DefaultTokenServices tokenServices = (DefaultTokenServices) endpoints.getDefaultAuthorizationServerTokenServices();
-//    tokenServices.setTokenStore(endpoints.getTokenStore());
-//    tokenServices.setSupportRefreshToken(true);
-//    tokenServices.setClientDetailsService(endpoints.getClientDetailsService());
-//    tokenServices.setTokenEnhancer(endpoints.getTokenEnhancer());
-//    tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(1));//一天
-//    endpoints.tokenServices(tokenServices);
+    // 配置TokenServices参数
+    DefaultTokenServices tokenServices = (DefaultTokenServices) endpoints.getDefaultAuthorizationServerTokenServices();
+    tokenServices.setTokenStore(endpoints.getTokenStore());
+    tokenServices.setSupportRefreshToken(true);
+    tokenServices.setClientDetailsService(endpoints.getClientDetailsService());
+    tokenServices.setTokenEnhancer(endpoints.getTokenEnhancer());
+    tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(1));//一天
+    endpoints.tokenServices(tokenServices);
   }
 }

@@ -12,7 +12,7 @@ import java.util.Map;
  * 自定义CustomerAccessTokenConverter 这个类的作用主要用于AccessToken的转换，
  * 默认使用DefaultAccessTokenConverter 这个装换器
  * DefaultAccessTokenConverter有个UserAuthenticationConverter，这个转换器作用是把用户的信息放入token中，
- * 默认只是放入username
+ * 默认只是放入user_name
  * <p>
  * 自定义了下这个方法，加入了额外的信息
  * <p>
@@ -29,7 +29,8 @@ public class CustomerAccessTokenConverter extends DefaultAccessTokenConverter {
     @Override
     public Map<String, ?> convertUserAuthentication(Authentication authentication) {
       LinkedHashMap <String, Object> response = new LinkedHashMap <>();
-      response.put("user_name", authentication.getName());
+      response.put("details", authentication.getDetails());
+      response.put("test","hello");
       if (authentication.getAuthorities() != null && !authentication.getAuthorities().isEmpty()) {
         response.put("authorities", AuthorityUtils.authorityListToSet(authentication.getAuthorities()));
       }
