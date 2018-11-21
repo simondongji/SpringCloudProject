@@ -44,7 +44,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
             .withClient("client1")//用于标识用户ID
-            .authorizedGrantTypes("client_credentials","refresh_token")//授权方式
+            .authorizedGrantTypes("authorization_code","client_credentials","refresh_token")//授权方式
             .scopes("test")//授权范围
             .secret(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("123456"));//客户端安全码,secret密码配置从 Spring Security 5.0开始必须以 {bcrypt}+加密后的密码 这种格式填写;
   }
