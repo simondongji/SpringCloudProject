@@ -1,7 +1,6 @@
 package priv.simon.springboot.redis;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +18,9 @@ import java.util.concurrent.TimeUnit;
  **/
 @Component
 public class RedisUtils {
+  /**
+   * 注入redisTemplate bean
+   */
   @Autowired
   private RedisTemplate <String,Object> redisTemplate;
 
@@ -42,7 +44,7 @@ public class RedisUtils {
   }
 
   /**
-   * 根据key 获取过期时间
+   * 根据key获取过期时间
    *
    * @param key 键 不能为null
    * @return 时间(秒) 返回0代表为永久有效
@@ -81,7 +83,7 @@ public class RedisUtils {
       }
     }
   }
-  // ============================String=============================
+  // ============================String(字符串)=============================
 
   /**
    * 普通缓存获取
@@ -159,7 +161,7 @@ public class RedisUtils {
     }
     return redisTemplate.opsForValue().increment(key, -delta);
   }
-  // ================================Map=================================
+  // ================================Hash(哈希)=================================
 
   /**
    * HashGet
@@ -294,7 +296,6 @@ public class RedisUtils {
   }
 
   /**
-   * 280
    * hash递减
    *
    * @param key  键
@@ -305,7 +306,7 @@ public class RedisUtils {
   public double hdecr(String key, String item, double by) {
     return redisTemplate.opsForHash().increment(key, item, -by);
   }
-  // ============================set=============================
+  // ============================Set(集合)=============================
 
   /**
    * 根据key获取Set中的所有值
@@ -405,7 +406,7 @@ public class RedisUtils {
       return 0;
     }
   }
-  // ===============================list=================================
+  // ===============================List(列表)=================================
 
   /**
    * 获取list缓存的内容
